@@ -193,6 +193,13 @@ async def prepare_menu(
         if state is None or state.cook_status not in ('standby', 'ready', 'cooking_end', 'preheat_end'):
             raise ValueError(f'chamber {chamber} is active or unavailable')
     if len(programs) == 1:
-        chamber = next(iter(programs))
-        return await device.prepare_program(chamber=chamber, **programs[chamber])
+        program = menu.chambers[0]
+        return await device.prepare_program(
+            chamber=program.chamber,
+            temperature=program.temperature,
+            minutes=program.minutes,
+            mode=program.mode,
+        )
+    if sync_type is None:
+        raise ValueError('two-chamber menus require explicit sync_type 1 or 2')
     return await device.prepare_both_chambers(programs[1], programs[2], sync_type)
